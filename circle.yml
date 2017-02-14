@@ -1,0 +1,28 @@
+machine:
+  services:
+    - docker
+  environment:
+    DOCKER_IMAGE_NAME: quay.io/mojanalytics/rstudio-auth-proxy
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+
+  override:
+    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
+    - docker build --rm=false -t $DOCKER_IMAGE_NAME .
+    - mkdir -p ~/docker; docker save $DOCKER_IMAGE_NAME > ~/docker/image.tar
+
+test:
+  override:
+    - echo "test"
+
+deployment:
+  production:
+    branch: master
+    commands:
+       - docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} -e ${QUAY_EMAIL} quay.io
+       - docker build -t $DOCKER_IMAGE_NAME:${CIRCLE_SHA1} .
+       - docker tag -f $DOCKER_IMAGE_NAME:${CIRCLE_SHA1} $DOCKER_IMAGE_NAME:latest
+       - docker push $DOCKER_IMAGE_NAME:${CIRCLE_SHA1}
+       - docker push $DOCKER_IMAGE_NAME:latest
