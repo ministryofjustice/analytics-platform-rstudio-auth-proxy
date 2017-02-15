@@ -12,19 +12,15 @@ var env = {
 
 var proxy = httpProxy.createProxyServer({
   target: {
-      host: process.env.SHINY_HOST,
-      port: process.env.SHINY_PORT
-    }
+    host: process.env.SHINY_HOST,
+    port: process.env.SHINY_PORT
+  },
+  ws: true
 });
 
 proxy.on('error', function(e) {
   console.log('Error connecting');
   console.log(e);
-});
-
-proxy.on('upgrade', function (req, socket, head) {
-  console.log('Websocket upgrade');
-  proxy.ws(req, socket, head);
 });
 
 var setIfExists = function(proxyReq, header, value){
