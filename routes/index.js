@@ -81,6 +81,9 @@ router.all('/favicon.ico', function(req, res, next) {
 
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
+  console.log('REQUEST = ', JSON.stringify(req))
+  console.log('REQUEST HEADERS = ', JSON.stringify(req.headers))
+
   var username = userFromRequest(req)
   console.log('Username from request = ' + username)
 
