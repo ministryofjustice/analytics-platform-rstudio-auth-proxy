@@ -7,7 +7,8 @@ var router = express.Router();
 var env = {
   AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
   AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
-  AUTH0_CALLBACK_URL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback'
+  AUTH0_CALLBACK_URL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback',
+  USER: process.env.USER,
 }
 
 var proxy = httpProxy.createProxyServer({
@@ -23,30 +24,21 @@ proxy.on('error', function(e) {
   console.log(e);
 });
 
-var setIfExists = function(proxyReq, header, value){
-  if(value){
-    proxyReq.setHeader(header, value);
-  }
-}
-
 proxy.on('proxyReq', function(proxyReq, req, res, options) {
   if(req.user){
-    // setIfExists(proxyReq, 'x-auth0-nickname', req.user._json.nickname);
-    // setIfExists(proxyReq, 'x-auth0-user_id', req.user._json.user_id);
-    // setIfExists(proxyReq, 'x-auth0-email', req.user._json.email);
-    // setIfExists(proxyReq, 'x-auth0-name', req.user._json.name);
-    // setIfExists(proxyReq, 'x-auth0-picture', req.user._json.picture);
-    // setIfExists(proxyReq, 'x-auth0-locale', req.user._json.locale);
-    //setIfExists(proxyReq, 'X-RStudio-Username', req.user._json.nickname);
-
     // make sure Github usernames are lowercased - username is used in k8s resource labels,
     // which only allow lowercase
     if(req.user.__json && req.user.__json.nickname){
-      proxyReq.setHeader('X-RStudio-Username', req.user.__json.nickname.toLowerCase())
+      var nickname = req.user.__json.nickname.toLowerCase()
+      if (nickname === env.USER) {
+        proxyReq.setHeader('X-RStudio-Username', nickname)
+      } else {
+        // Not the owner of the machine - 403 FORBIDDEN
+        res.sendStatus(403);
+      }
     }
   }
 });
-
 
 /* Handle login */
 router.get('/login',
@@ -82,12 +74,6 @@ router.all('/favicon.ico', function(req, res, next) {
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
   proxy.web(req, res);
 });
-
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.redirect('/reports/');
-// });
-
 
 
 module.exports = router;

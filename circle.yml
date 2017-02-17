@@ -3,6 +3,7 @@ machine:
     - docker
   environment:
     DOCKER_IMAGE_NAME: quay.io/mojanalytics/rstudio-auth-proxy
+    DOCKER_IMAGE_TAG: $(echo $CIRCLE_SHA1 | cut -c -8)
 
 dependencies:
   cache_directories:
@@ -21,8 +22,8 @@ deployment:
   production:
     branch: master
     commands:
-       - docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} -e ${QUAY_EMAIL} quay.io
-       - docker build -t $DOCKER_IMAGE_NAME:${CIRCLE_SHA1} .
-       - docker tag -f $DOCKER_IMAGE_NAME:${CIRCLE_SHA1} $DOCKER_IMAGE_NAME:latest
-       - docker push $DOCKER_IMAGE_NAME:${CIRCLE_SHA1}
+       - docker login -u $QUAY_USERNAME -p $QUAY_PASSWORD -e $QUAY_EMAIL quay.io
+       - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
+       - docker tag -f $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+       - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
        - docker push $DOCKER_IMAGE_NAME:latest
