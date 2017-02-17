@@ -7,7 +7,8 @@ var router = express.Router();
 var env = {
   AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
   AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
-  AUTH0_CALLBACK_URL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback'
+  AUTH0_CALLBACK_URL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback',
+  USER: process.env.USER,
 }
 
 var proxy = httpProxy.createProxyServer({
@@ -42,7 +43,13 @@ proxy.on('proxyReq', function(proxyReq, req, res, options) {
     // make sure Github usernames are lowercased - username is used in k8s resource labels,
     // which only allow lowercase
     if(req.user.__json && req.user.__json.nickname){
-      proxyReq.setHeader('X-RStudio-Username', req.user.__json.nickname.toLowerCase())
+      var nickname = req.user.__json.nickname.toLowerCase()
+      if (nickname === env.USER) {
+        proxyReq.setHeader('X-RStudio-Username', nickname)
+      } else {
+        // Not the owner of the machine - 403 FORBIDDEN
+        res.sendStatus(403);
+      }
     }
   }
 });
