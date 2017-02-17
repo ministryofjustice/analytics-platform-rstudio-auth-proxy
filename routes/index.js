@@ -83,11 +83,5 @@ router.all(/.*/, ensureLoggedIn, function(req, res, next) {
   proxy.web(req, res);
 });
 
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.redirect('/reports/');
-// });
-
-
 
 module.exports = router;
