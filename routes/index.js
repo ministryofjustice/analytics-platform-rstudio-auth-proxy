@@ -31,8 +31,8 @@ function userFromRequest(req) {
   if (req && req.user) {
     console.log('REQUEST USER = ', JSON.stringify(req.user))
   }
-  if (req && req.user && req.user.__json && req.user.__json.nickname) {
-    return req.user.__json.nickname.toLowerCase()
+  if (req && req.user && req.user.nickname) {
+    return req.user.nickname.toLowerCase()
   } else {
     return null
   }
@@ -45,6 +45,7 @@ function isAuthorised(username) {
 
 proxy.on('proxyReq', function(proxyReq, req, res, options) {
   var username = userFromRequest(req)
+  console.log('Username from request (on proxyReq) = ' + username)
 
   if (username) {
     console.log('Setting X-RStudio-Username=' + nickname)
@@ -84,11 +85,8 @@ router.all('/favicon.ico', function(req, res, next) {
 
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
-  // console.log('REQUEST = ', JSON.stringify(req))
-  // console.log('REQUEST HEADERS = ', JSON.stringify(req.headers))
-
   var username = userFromRequest(req)
-  console.log('Username from request = ' + username)
+  console.log('Username from request (all function) = ' + username)
 
   if (isAuthorised(username)) {
     proxy.web(req, res);
