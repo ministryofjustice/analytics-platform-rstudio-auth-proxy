@@ -28,6 +28,9 @@ proxy.on('error', function(e) {
 //
 // username is used in k8s resource labels, which only allow lowercase
 function userFromRequest(req) {
+  if (req && req.user) {
+    console.log('REQUEST USER = ', JSON.stringify(req.user))
+  }
   if (req && req.user && req.user.__json && req.user.__json.nickname) {
     return req.user.__json.nickname.toLowerCase()
   } else {
@@ -81,8 +84,8 @@ router.all('/favicon.ico', function(req, res, next) {
 
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
-  console.log('REQUEST = ', JSON.stringify(req))
-  console.log('REQUEST HEADERS = ', JSON.stringify(req.headers))
+  // console.log('REQUEST = ', JSON.stringify(req))
+  // console.log('REQUEST HEADERS = ', JSON.stringify(req.headers))
 
   var username = userFromRequest(req)
   console.log('Username from request = ' + username)
