@@ -24,19 +24,28 @@ proxy.on('error', function(e) {
   console.log(e);
 });
 
+// Get username from request (lowercase)
+//
+// username is used in k8s resource labels, which only allow lowercase
+function userFromRequest(req) {
+  if (req && req.user && req.user.__json && req.user.__json.nickname) {
+    return req.user.__json.nickname.toLowerCase()
+  } else {
+    return null
+  }
+}
+
+// True for the owner of the machine/k8s namespace, false otherwise
+function isAuthorised(username) {
+  return username === env.USER
+}
+
 proxy.on('proxyReq', function(proxyReq, req, res, options) {
-  if(req.user){
-    // make sure Github usernames are lowercased - username is used in k8s resource labels,
-    // which only allow lowercase
-    if(req.user.__json && req.user.__json.nickname){
-      var nickname = req.user.__json.nickname.toLowerCase()
-      if (nickname === env.USER) {
-        proxyReq.setHeader('X-RStudio-Username', nickname)
-      } else {
-        // Not the owner of the machine - 403 FORBIDDEN
-        res.sendStatus(403);
-      }
-    }
+  var username = userFromRequest(req)
+
+  if (username) {
+    console.log('Setting X-RStudio-Username=' + nickname)
+    proxyReq.setHeader('X-RStudio-Username', nickname)
   }
 });
 
@@ -72,7 +81,16 @@ router.all('/favicon.ico', function(req, res, next) {
 
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
-  proxy.web(req, res);
+  var username = userFromRequest(req)
+  console.log('Username from request = ' + username)
+
+  if (isAuthorised(username)) {
+    proxy.web(req, res);
+  } else {
+    // Not the owner of the machine - 403 FORBIDDEN
+    console.log('403 FORBIDDEN for user ' + nickname)
+    res.sendStatus(403);
+  }
 });
 
 
