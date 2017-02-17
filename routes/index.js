@@ -88,7 +88,7 @@ router.all(/.*/, ensureLoggedIn, function(req, res, next) {
     proxy.web(req, res);
   } else {
     // Not the owner of the machine - 403 FORBIDDEN
-    console.log('403 FORBIDDEN for user ' + nickname)
+    console.log('403 FORBIDDEN for user ' + username)
     res.sendStatus(403);
   }
 });
