@@ -16,7 +16,8 @@ var proxy = httpProxy.createProxyServer({
     host: process.env.SHINY_HOST,
     port: process.env.SHINY_PORT
   },
-  ws: true
+  ws: true,
+  proxyTimeout: (24 * 60 * 60 * 1000) // 1 day
 });
 
 proxy.on('error', function(e) {
