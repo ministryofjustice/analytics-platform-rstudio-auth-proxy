@@ -44,6 +44,12 @@ var proxy = httpProxy.createProxyServer({
 server.on('upgrade', function (req, socket, head) {
   //req.url = req.url.substring(8);
   console.log('⚡️ ---------- SOCKET CONNECTION UPGRADING ---------- ⚡');
+  console.log('  ---------- REQ ----------  ');
+  console.log(req);
+  console.log('  ---------- SOCKET ----------  ');
+  console.log(socket);
+  console.log('  ---------- HEAD ----------  ');
+  console.log(head);
   proxy.ws(req, socket, head);
 });
 
