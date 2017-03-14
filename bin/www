@@ -34,9 +34,11 @@ server.on('listening', onListening);
 
 var proxy = httpProxy.createProxyServer({
   target: {
-      host: process.env.SHINY_HOST,
-      port: process.env.SHINY_PORT
-    }
+    host: process.env.SHINY_HOST,
+    port: process.env.SHINY_PORT
+  },
+  ws: true,
+  proxyTimeout: (24 * 60 * 60 * 1000) // 1 day
 });
 
 server.on('upgrade', function (req, socket, head) {
