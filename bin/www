@@ -41,17 +41,37 @@ var proxy = httpProxy.createProxyServer({
   proxyTimeout: (24 * 60 * 60 * 1000) // 1 day
 });
 
-// server.on('upgrade', function (req, socket, head) {
-//   //req.url = req.url.substring(8);
-//   console.log('⚡️ ---------- SOCKET CONNECTION UPGRADING ---------- ⚡');
-//   console.log('  ---------- REQ ----------  ');
-//   console.log(req);
-//   console.log('  ---------- SOCKET ----------  ');
-//   console.log(socket);
-//   console.log('  ---------- HEAD ----------  ');
-//   console.log(head);
-//   proxy.ws(req, socket, head);
-// });
+proxy.on('error', function(err) {
+    console.log(err);
+});
+
+/*
+FIXME:
+
+Websocket requests also require that the RStudio username header be present and
+correct.
+
+However, as Passport authentication does not handle websockets we can't use
+req.user or req.session info for the username, as with HTTP requests. So instead
+we take the username from the requested hostname instead.
+
+This is imperfect, and should be replaced with an actual check for an active
+authenticated session. However, as RStudio only uses websockets for Shiny app
+previews, on paths including the current session ID and a randomly assigned
+port, websocket URLs are impossible to guess or enumerate without an active
+authenticated HTTP session, the security risk is minimal at worst.
+*/
+proxy.on('proxyReqWs', function(proxyReqWs, req, res, options) {
+    var matches = /^(.*)-rstudio\..*/.exec(req.headers.host);
+    if(matches[1]){
+      proxyReqWs.setHeader('X-RStudio-Username', matches[1]);
+    }
+});
+
+server.on('upgrade', function (req, socket, head) {
+  var target = 'ws://' + process.env.SHINY_HOST + ':' + process.env.SHINY_PORT;
+  proxy.ws(req, socket, head, {target: target});
+});
 
 
 /**
