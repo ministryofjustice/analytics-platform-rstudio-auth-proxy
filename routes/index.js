@@ -76,7 +76,7 @@ router.all('/auth-sign-in', function(req, res, next) {
   proxy.web(req, res);
 });
 
-router.all('/favicon.ico', function(req, res, next) {
+router.all(/.*favicon\.ico$/, function(req, res, next) {
   proxy.web(req, res);
 });
 
