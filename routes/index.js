@@ -25,31 +25,6 @@ proxy.on('error', function(e) {
   console.log(e);
 });
 
-// Get username from request (lowercase)
-//
-// username is used in k8s resource labels, which only allow lowercase
-function userFromRequest(req) {
-  if (req && req.user && req.user.nickname) {
-    return req.user.nickname.toLowerCase()
-  } else {
-    return null
-  }
-}
-
-// True for the owner of the machine/k8s namespace, false otherwise
-function isAuthorised(username) {
-  return username === env.USER
-}
-
-proxy.on('proxyReq', function(proxyReq, req, res, options) {
-  var username = userFromRequest(req)
-
-  if (username) {
-    console.log('Setting X-RStudio-Username=' + username)
-    proxyReq.setHeader('X-RStudio-Username', username)
-  }
-});
-
 /* Handle login */
 router.get('/login',
   function(req, res){
@@ -71,26 +46,9 @@ router.get('/callback',
   }
 );
 
-/* Proxy RStudio login URL */
-router.all('/auth-sign-in', function(req, res, next) {
-  proxy.web(req, res);
-});
-
-router.all(/.*favicon\.ico$/, function(req, res, next) {
-  proxy.web(req, res);
-});
-
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
-  var username = userFromRequest(req)
-
-  if (isAuthorised(username)) {
-    proxy.web(req, res);
-  } else {
-    // Not the owner of the machine - 403 FORBIDDEN
-    console.log('403 FORBIDDEN for user ' + username)
-    res.sendStatus(403);
-  }
+  proxy.web(req, res);
 });
 
 
