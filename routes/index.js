@@ -46,7 +46,7 @@ function setAuthCookie(req) {
   var staySignedInDays = process.env.STAY_SIGNED_IN_DAYS || 1;
   var duration = staySignedInDays * 24 * 60 * 60 * 1000;
   cookie = [
-    'user-id=' + secureCookie('rstudio', duration),
+    'user-id=' + secureCookie(process.env.USER, duration),
     'Path=/',
     'HttpOnly'
   ].join('; ');
