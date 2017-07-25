@@ -45,12 +45,15 @@ function secureCookie(value, validDuration) {
 function setAuthCookie(req) {
   var staySignedInDays = process.env.STAY_SIGNED_IN_DAYS || 1;
   var duration = staySignedInDays * 24 * 60 * 60 * 1000;
-  cookie = [
-    'user-id=' + secureCookie(process.env.USER, duration),
-    'Path=/',
-    'HttpOnly'
-  ].join('; ');
-  req.setHeader('Cookie', cookie);
+  var cookies = req._headers.cookie.split('; ');
+  for (var cookie in cookies) {
+    var [key, value] = cookie.split('=');
+    if (key == 'user-id') {
+      return;
+    }
+  }
+  cookies.push('user-id=' + secureCookie(process.env.USER, duration));
+  req.setHeader('Cookie', cookies.join('; '));
 }
 
 var env = {
@@ -77,6 +80,12 @@ proxy.on('error', function(e) {
 
 proxy.on('proxyReq', function (proxyReq, req, res, options) {
   setAuthCookie(proxyReq);
+  if (req.body) {
+    let length = Buffer.byteLength(req.body);
+    proxyReq.setHeader('Content-Type', 'application/json');
+    proxyReq.setHeader('Content-Length', length);
+    proxyReq.write(req.body);
+  }
 });
 
 /* Handle login */
@@ -107,7 +116,17 @@ router.get('/callback',
 
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
-  proxy.web(req, res);
+  if (req.method == 'POST') {
+    req.body = '';
+    req.addListener('data', function (chunk) {
+      req.body += chunk;
+    });
+    req.addListener('end', function () {
+      proxy.web(req, res);
+    });
+  } else {
+    proxy.web(req, res);
+  }
 });
 
 
