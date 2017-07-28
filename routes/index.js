@@ -88,6 +88,10 @@ proxy.on('proxyReq', function (proxyReq, req, res, options) {
   }
 });
 
+proxy.on('upgrade', function (req, socket, head) {
+  proxy.ws(req, socket, head);
+});
+
 /* Handle login */
 router.get('/login',
   function(req, res){
