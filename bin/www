@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('nodejs-regular-webapp2:server');
 var http = require('http');
 var httpProxy = require('http-proxy');
+var setAuthCookie = require('../auth');
 
 /**
  * Get port from environment and store in Express.
@@ -63,8 +64,8 @@ authenticated HTTP session, the security risk is minimal at worst.
 */
 proxy.on('proxyReqWs', function(proxyReqWs, req, res, options) {
     var matches = /^(.*)-rstudio\..*/.exec(req.headers.host);
-    if(matches[1]){
-      proxyReqWs.setHeader('X-RStudio-Username', matches[1]);
+    if(matches && matches[1]){
+      setAuthCookie(proxyReqWs, matches[1]);
     }
 });
 
