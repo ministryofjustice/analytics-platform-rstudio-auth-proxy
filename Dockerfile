@@ -1,4 +1,4 @@
-FROM node:7.4.0-alpine
+FROM node:6.11-alpine
 
 RUN mkdir /app
 ADD package.json /app/
