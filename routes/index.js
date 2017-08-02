@@ -33,7 +33,6 @@ proxy.on('proxyReq', function (proxyReq, req, res, options) {
   setAuthCookie(proxyReq);
   if (req.body) {
     let length = Buffer.byteLength(req.body);
-    proxyReq.setHeader('Content-Type', 'application/json');
     proxyReq.setHeader('Content-Length', length);
     proxyReq.write(req.body);
   }
