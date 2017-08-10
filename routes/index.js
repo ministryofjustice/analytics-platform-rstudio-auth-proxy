@@ -83,7 +83,7 @@ router.all(/.*/, ensureLoggedIn, function(req, res, next) {
 function authorisedUser(req) {
 
   if (req && req.user && req.user.nickname) {
-    return req.user.nickname.toLowerCase() == env.USER;
+    return req.user.nickname.toLowerCase() == env.USER.toLowerCase();
   }
 
   return false;
