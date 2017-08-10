@@ -66,18 +66,37 @@ router.get('/callback',
 
 /* Authenticate and proxy all other requests */
 router.all(/.*/, ensureLoggedIn, function(req, res, next) {
-  if (req.method == 'POST') {
-    req.body = '';
-    req.addListener('data', function (chunk) {
-      req.body += chunk;
-    });
-    req.addListener('end', function () {
-      proxy.web(req, res);
-    });
+
+  if (!authorisedUser(req)) {
+    console.log('User not authorised')
+    res.sendStatus(403);
+
+  } else if (req.method == 'POST') {
+    proxyPostRequest(req, res);
+
   } else {
     proxy.web(req, res);
   }
+
 });
 
+function authorisedUser(req) {
+
+  if (req && req.user && req.user.nickname) {
+    return req.user.nickname.toLowerCase() == env.USER;
+  }
+
+  return false;
+}
+
+function proxyPostRequest(req, res) {
+  req.body = '';
+  req.addListener('data', function (chunk) {
+    req.body += chunk;
+  });
+  req.addListener('end', function () {
+    proxy.web(req, res);
+  });
+}
 
 module.exports = router;
