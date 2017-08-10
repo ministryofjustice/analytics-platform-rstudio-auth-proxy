@@ -11,7 +11,7 @@ var env = {
   AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
   AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
   AUTH0_CALLBACK_URL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback',
-  USER: process.env.USER,
+  USER: process.env.USER.toLowerCase(),
 }
 
 var proxy = httpProxy.createProxyServer({
@@ -83,7 +83,7 @@ router.all(/.*/, ensureLoggedIn, function(req, res, next) {
 function authorisedUser(req) {
 
   if (req && req.user && req.user.nickname) {
-    return req.user.nickname.toLowerCase() == env.USER.toLowerCase();
+    return req.user.nickname.toLowerCase() == env.USER;
   }
 
   return false;
