@@ -71,7 +71,7 @@ router.all(/.*/, ensureLoggedIn, function(req, res, next) {
     console.log('User not authorised')
     res.sendStatus(403);
 
-  } else if (req.method == 'POST') {
+  } else if (req.method === 'POST') {
     proxyPostRequest(req, res);
 
   } else {
@@ -83,7 +83,7 @@ router.all(/.*/, ensureLoggedIn, function(req, res, next) {
 function authorisedUser(req) {
 
   if (req && req.user && req.user.nickname) {
-    return req.user.nickname.toLowerCase() == env.USER;
+    return req.user.nickname.toLowerCase() === env.USER;
   }
 
   return false;
