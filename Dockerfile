@@ -1,9 +1,10 @@
 FROM node:6.11-alpine
 
-RUN mkdir /app
-ADD package.json /app/
 WORKDIR /app
-RUN npm install
-ADD . /app
 
-CMD ["node", "bin/www"]
+ADD package.json ./
+RUN npm install
+
+ADD app app/
+
+CMD ["npm", "start"]
