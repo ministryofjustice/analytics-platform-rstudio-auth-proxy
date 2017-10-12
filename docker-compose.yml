@@ -1,0 +1,26 @@
+version: "3"
+services:
+  auth_proxy:
+    build: .
+    image: rstudio-auth-proxy
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rstudio
+    env_file:
+      - .env
+    environment:
+      - EXPRESS_HOST=0.0.0.0
+      - EXPRESS_PORT=3000
+      - SHINY_HOST=rstudio
+      - SHINY_PORT=8787
+      - SECURE_COOKIE_KEY=foo
+      - USER=andyhd
+  rstudio:
+    image: quay.io/mojanalytics/rstudio
+    environment:
+      - PROXY_URL=http://auth_proxy:3000
+      - SECURE_COOKIE_KEY=foo
+      - USER=andyhd
+    ports:
+      - "8787:8787"
