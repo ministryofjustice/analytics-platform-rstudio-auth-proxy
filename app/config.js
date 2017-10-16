@@ -23,3 +23,19 @@ config.auth0 = {
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
   callbackURL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback'
 };
+
+config.proxy = {
+  target: {
+    host: process.env.PROXY_TARGET_HOST,
+    port: process.env.PROXY_TARGET_PORT
+  },
+  ws: true,
+  preserveHeaderKeyCase: true,
+  proxyTimeout: process.env.PROXY_TIMEOUT || (24 * 60 * 60 * 1000)
+};
+
+config.rstudio = {
+  user: process.env.RSTUDIO_USER || process.env.USER,
+  duration: (24 * 60 * 60 * 1000),
+  key: process.env.SECURE_COOKIE_KEY
+};

@@ -1,4 +1,7 @@
-module.exports.denyUnauthorized = function denyUnauthorized(req, res, next) {
+var config = require('./config');
+
+
+module.exports.denyUnauthorized = function (req, res, next) {
 
   if (isAuthorized(req)) {
     next();
@@ -11,9 +14,11 @@ module.exports.denyUnauthorized = function denyUnauthorized(req, res, next) {
 
 function isAuthorized(req) {
   try {
-    return req.user.nickname.toLowerCase() === env.USER;
+    return req.user.nickname.toLowerCase() === config.rstudio.user;
 
-  } finally {
-    return false;
+  } catch (error) {
+    // do nothing
   }
+
+  return false;
 }

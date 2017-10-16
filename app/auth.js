@@ -30,25 +30,11 @@ function base64HMAC(message, key) {
 }
 
 
-function secureCookie(value, validDuration) {
+function secureCookie(value, validDuration, cookieKey) {
   var expires = formatDate(expiry(validDuration));
-  var hmac = base64HMAC(value + expires, process.env.SECURE_COOKIE_KEY);
+  var hmac = base64HMAC(value + expires, cookieKey);
   return [value, expires, hmac].map(encodeURIComponent).join('|');
 }
 
 
-function setAuthCookie(req) {
-  var staySignedInDays = process.env.STAY_SIGNED_IN_DAYS || 1;
-  var duration = staySignedInDays * 24 * 60 * 60 * 1000;
-  var cookies = req._headers.cookie.split('; ');
-  for (var cookie in cookies) {
-    var [key, value] = cookie.split('=');
-    if (key == 'user-id') {
-      return;
-    }
-  }
-  cookies.push('user-id=' + secureCookie(process.env.USER, duration));
-  req.setHeader('Cookie', cookies.join('; '));
-}
-
-module.exports = setAuthCookie;
+module.exports.cookie = secureCookie;

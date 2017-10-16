@@ -11,6 +11,9 @@ var Auth0Strategy = require('passport-auth0');
 var app = require('express')();
 app.set('views', path.join(__dirname, 'views'));
 
+// add before logging to avoid favicon requests in logs
+app.use(require('serve-favicon')(path.join(__dirname, 'favicon.ico')));
+
 bole.output({level: config.log.level, stream: process.stdout});
 app.use(morgan('combined'));
 

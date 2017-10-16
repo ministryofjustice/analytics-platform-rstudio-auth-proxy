@@ -11,16 +11,13 @@ services:
       - .env
     environment:
       - EXPRESS_HOST=0.0.0.0
-      - EXPRESS_PORT=3000
-      - SHINY_HOST=rstudio
-      - SHINY_PORT=8787
-      - SECURE_COOKIE_KEY=foo
-      - USER=andyhd
+      - PROXY_TARGET_HOST=rstudio
   rstudio:
     image: quay.io/mojanalytics/rstudio
     environment:
-      - PROXY_URL=http://auth_proxy:3000
+      - PROXY_URL=http://andyhd-rstudio.localhost:3000
       - SECURE_COOKIE_KEY=foo
+      - RSTUDIO_USER=andyhd
       - USER=andyhd
     ports:
       - "8787:8787"
