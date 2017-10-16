@@ -1,4 +1,3 @@
-var join = require('path').join;
 var config = module.exports;
 
 
