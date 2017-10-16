@@ -1,3 +1,4 @@
+var config = require('./config');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 var express = require('express');
 var middleware = require('./middleware');
@@ -7,7 +8,7 @@ var router = new express.Router();
 
 
 router.get('/login', function(req, res) {
-  res.render('login.html', {env: process.env});
+  res.render('login.html', {auth0: config.auth0});
 });
 
 router.get('/logout', function(req, res) {
