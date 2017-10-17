@@ -1,0 +1,23 @@
+version: "3"
+services:
+  auth_proxy:
+    build: .
+    image: rstudio-auth-proxy
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rstudio
+    env_file:
+      - .env
+    environment:
+      - EXPRESS_HOST=0.0.0.0
+      - PROXY_TARGET_HOST=rstudio
+  rstudio:
+    image: quay.io/mojanalytics/rstudio
+    environment:
+      - PROXY_URL=http://andyhd-rstudio.localhost:3000
+      - SECURE_COOKIE_KEY=foo
+      - RSTUDIO_USER=andyhd
+      - USER=andyhd
+    ports:
+      - "8787:8787"

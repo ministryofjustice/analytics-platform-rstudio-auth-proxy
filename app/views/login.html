@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<script src="https://cdn.auth0.com/js/lock/10.23.1/lock.min.js"></script>
+
+<div id="root" style="width: 280px; margin: 40px auto; padding: 10px;">
+
+  <script>
+    var lock = new Auth0Lock('{{auth0.clientID}}', '{{auth0.domain}}', {
+        auth: {
+          redirectUrl: '{{auth0.callbackURL}}',
+          responseType: 'code',
+          params: { scope: 'openid profile' }
+        },
+        closable: false,
+        autofocus: true
+      }
+    );
+    lock.show();
+  </script>
+</div>
+
+{% endblock %}
