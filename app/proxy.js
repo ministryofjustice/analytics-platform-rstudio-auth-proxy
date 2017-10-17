@@ -4,7 +4,6 @@ var httpProxy = require('http-proxy');
 var log = require('bole')('proxy');
 
 
-log.info('Starting proxy:', config.proxy);
 var proxy = httpProxy.createProxyServer(config.proxy);
 
 proxy.on('proxyReq', function (proxyReq, req, res, options) {
@@ -14,7 +13,11 @@ proxy.on('proxyReq', function (proxyReq, req, res, options) {
 
 proxy.on('proxyReqWs', function (proxyReqWs, req, res, options) {
   proxyReqWs.setHeader('Cookie', insert_auth_cookie(req));
-  proxy_body(req, proxyReq);
+  proxy_body(req, proxyReqWs);
+});
+
+proxy.on('error', function (err) {
+  log.error(err);
 });
 
 function insert_auth_cookie(req) {
@@ -23,7 +26,8 @@ function insert_auth_cookie(req) {
 }
 
 function insert_cookie(req, name, value) {
-  var cookies = req.get('Cookie').split('; ');
+  log.debug('cookie header:', req.headers['Cookie']);
+  var cookies = (req.headers['Cookie'] || '').split('; ');
 
   // remove existing cookie
   cookies = cookies.filter(function (cookie) {

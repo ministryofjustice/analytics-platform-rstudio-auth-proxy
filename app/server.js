@@ -7,7 +7,6 @@ var proxy = require('./proxy');
 
 log.info('Auth proxy process starting');
 
-
 var server = http.createServer(app)
 server.listen(config.express.port, config.express.host, function (error) {
 
@@ -20,6 +19,5 @@ server.listen(config.express.port, config.express.host, function (error) {
 });
 
 server.on('upgrade', function (req, socket, head) {
-  var target = 'ws://' + config.proxy.target.host + ':' + config.proxy.target.port;
-  proxy.ws(req, socket, head, {target: target});
+  proxy.ws(req, socket, head);
 });
