@@ -8,6 +8,10 @@ var router = new express.Router();
 const uuidv4 = require('uuid/v4');
 
 
+const RETURN_TO = encodeURI(`${config.app.protocol}://${config.app.host}`);
+const SSO_LOGOUT_URL = `https://${config.auth0.domain}${config.auth0.sso_logout_url}?returnTo=${RETURN_TO}&client_id=${config.auth0.clientID}`;
+
+
 router.get('/login', function(req, res, next) {
   if (req.isAuthenticated()) {
     if (/^http/.test(req.session.returnTo)) {
@@ -22,15 +26,16 @@ router.get('/login', function(req, res, next) {
   }
 });
 
-router.get('/logout', function(req, res) {
+function logout(req, res) {
   req.logout();
-  res.redirect('/login');
-});
+  req.session.destroy(() => {
+    res.clearCookie(config.session.name);
+    res.redirect(SSO_LOGOUT_URL);
+  });
+}
 
-router.get('/auth-sign-out', function (req, res) {
-  req.logout();
-  res.redirect('/login');
-});
+router.get('/logout', logout);
+router.get('/auth-sign-out', logout);
 
 router.get('/callback', [
   passport.authenticate('auth0-oidc', { failureRedirect: '/login' }),

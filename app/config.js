@@ -1,6 +1,11 @@
 var config = module.exports;
 
 
+config.app = {
+  protocol: process.env.APP_PROTOCOL || 'http',
+  host: process.env.APP_HOST || 'localhost:3000',
+};
+
 config.express = {
   port: process.env.EXPRESS_PORT || 3000,
   host: process.env.EXPRESS_HOST || '127.0.0.1'
@@ -11,9 +16,10 @@ config.log = {
 };
 
 config.session = {
-  secret: process.env.COOKIE_SECRET || 'shh-its-a-secret',
+  name: 'session',
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
+  secret: process.env.COOKIE_SECRET || 'shh-its-a-secret',
 };
 
 config.auth0 = {
@@ -21,8 +27,9 @@ config.auth0 = {
   clientID: process.env.AUTH0_CLIENT_ID,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
   domain: process.env.AUTH0_DOMAIN,
-  scope: 'profile',
   passReqToCallback: true,
+  scope: 'profile',
+  sso_logout_url: '/v2/logout',
 };
 
 config.proxy = {
