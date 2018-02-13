@@ -5,7 +5,7 @@ var morgan = require('morgan');
 var nunjucks = require('nunjucks');
 var passport = require('passport');
 var path = require('path');
-var Auth0Strategy = require('passport-auth0');
+const Auth0Strategy = require('passport-auth0-openidconnect').Strategy;
 
 
 var app = require('express')();
@@ -25,12 +25,14 @@ nunjucks.configure(path.join(__dirname, 'views'), {
 app.use(require('cookie-parser')());
 app.use(require('express-session')(config.session));
 
-passport.use(new Auth0Strategy(
+strategy = new Auth0Strategy(
   config.auth0,
-  function(accessToken, refreshToken, extraParams, profile, done) {
-    return done(null, profile);
-  }
-));
+  ((req, issuer, audience, profile, accessToken, refreshToken, params, callback) => {
+    req.session.id_token = params.id_token;
+    return callback(null, profile._json);
+  }),
+);
+passport.use(strategy);
 
 passport.serializeUser(function(user, done) {
   done(null, user);

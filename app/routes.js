@@ -5,10 +5,21 @@ var middleware = require('./middleware');
 var passport = require('passport');
 var proxy = require('./proxy');
 var router = new express.Router();
+const uuidv4 = require('uuid/v4');
 
 
-router.get('/login', function(req, res) {
-  res.render('login.html', {auth0: config.auth0});
+router.get('/login', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    if (/^http/.test(req.session.returnTo)) {
+      res.send(400, 'URL must be relative');
+    } else {
+      res.redirect(req.session.returnTo);
+    }
+  } else {
+    passport.authenticate('auth0-oidc', {
+      state: uuidv4(),
+    })(req, res, next);
+  }
 });
 
 router.get('/logout', function(req, res) {
@@ -22,7 +33,7 @@ router.get('/auth-sign-out', function (req, res) {
 });
 
 router.get('/callback', [
-  passport.authenticate('auth0', { failureRedirect: '/login' }),
+  passport.authenticate('auth0-oidc', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect(req.session.returnTo || '/');
   }

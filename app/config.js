@@ -17,10 +17,12 @@ config.session = {
 };
 
 config.auth0 = {
-  domain: process.env.AUTH0_DOMAIN,
+  callbackURL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback',
   clientID: process.env.AUTH0_CLIENT_ID,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
-  callbackURL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback'
+  domain: process.env.AUTH0_DOMAIN,
+  scope: 'openid profile',
+  passReqToCallback: true,
 };
 
 config.proxy = {
