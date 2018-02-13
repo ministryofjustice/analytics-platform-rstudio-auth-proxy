@@ -29,6 +29,7 @@ strategy = new Auth0Strategy(
   config.auth0,
   ((req, issuer, audience, profile, accessToken, refreshToken, params, callback) => {
     req.session.id_token = params.id_token;
+
     return callback(null, profile._json);
   }),
 );

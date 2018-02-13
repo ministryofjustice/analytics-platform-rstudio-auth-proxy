@@ -1,23 +1,21 @@
 var config = require('./config');
+const log = require('bole')('middleware');
 
 
-module.exports.denyUnauthorized = function (req, res, next) {
-
-  if (isAuthorized(req)) {
+module.exports = function (req, res, next) {
+  if (_isAuthorized(req)) {
     next();
-
   } else {
     res.sendStatus(403);
     next(new Error('User is not authorized'));
   }
 };
 
-function isAuthorized(req) {
+function _isAuthorized(req) {
   try {
     return req.user.nickname.toLowerCase() === config.rstudio.user;
-
   } catch (error) {
-    // do nothing
+    log.error('Error while checking user nickname: ', error)
   }
 
   return false;

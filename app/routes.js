@@ -1,7 +1,7 @@
 var config = require('./config');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 var express = require('express');
-var middleware = require('./middleware');
+var authorisation = require('./authorisation');
 var passport = require('passport');
 var proxy = require('./proxy');
 var router = new express.Router();
@@ -41,7 +41,7 @@ router.get('/callback', [
 
 router.all(/.*/, [
   ensureLoggedIn('/login'),
-  middleware.denyUnauthorized,
+  authorisation,
   function(req, res) {
     parseBody(req).then(function (body) {
       req.body = body;
