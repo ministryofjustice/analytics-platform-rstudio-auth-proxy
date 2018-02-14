@@ -25,16 +25,13 @@ router.get('/login', (req, res, next) => {
   }
 });
 
-function logout(req, res) {
+router.get(['/logout', '/auth-sign-out'], (req, res) => {
   req.logout();
   req.session.destroy(() => {
     res.clearCookie(config.session.name);
     res.redirect(SSO_LOGOUT_URL);
   });
-}
-
-router.get('/logout', logout);
-router.get('/auth-sign-out', logout);
+});
 
 router.get('/callback', [
   passport.authenticate('auth0-oidc', { failureRedirect: '/login' }),
