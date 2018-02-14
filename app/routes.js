@@ -1,7 +1,6 @@
 const { ensureLoggedIn } = require('connect-ensure-login');
 const express = require('express');
 const passport = require('passport');
-const uuidv4 = require('uuid/v4');
 
 const config = require('./config');
 const authorization = require('./middleware/authorization');
@@ -22,9 +21,7 @@ router.get('/login', (req, res, next) => {
       res.redirect(req.session.returnTo);
     }
   } else {
-    passport.authenticate('auth0-oidc', {
-      state: uuidv4(),
-    })(req, res, next);
+    passport.authenticate('auth0-oidc')(req, res, next);
   }
 });
 
