@@ -1,4 +1,4 @@
-var config = module.exports;
+const config = module.exports;
 
 
 config.app = {
@@ -8,11 +8,11 @@ config.app = {
 
 config.express = {
   port: process.env.EXPRESS_PORT || 3000,
-  host: process.env.EXPRESS_HOST || '127.0.0.1'
+  host: process.env.EXPRESS_HOST || '127.0.0.1',
 };
 
 config.log = {
-  level: process.env.LOG_LEVEL || 'debug'
+  level: process.env.LOG_LEVEL || 'debug',
 };
 
 config.session = {
@@ -35,15 +35,15 @@ config.auth0 = {
 config.proxy = {
   target: {
     host: process.env.PROXY_TARGET_HOST,
-    port: process.env.PROXY_TARGET_PORT
+    port: process.env.PROXY_TARGET_PORT,
   },
   ws: true,
   preserveHeaderKeyCase: true,
-  proxyTimeout: process.env.PROXY_TIMEOUT || (24 * 60 * 60 * 1000)
+  proxyTimeout: process.env.PROXY_TIMEOUT || (24 * 60 * 60 * 1000),
 };
 
 config.rstudio = {
   user: process.env.RSTUDIO_USER || process.env.USER,
   duration: (24 * 60 * 60 * 1000),
-  key: process.env.SECURE_COOKIE_KEY
+  key: process.env.SECURE_COOKIE_KEY,
 };
