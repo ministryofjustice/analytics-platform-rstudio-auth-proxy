@@ -1,50 +1,62 @@
-var config = require('./config');
-var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
-var express = require('express');
-var middleware = require('./middleware');
-var passport = require('passport');
-var proxy = require('./proxy');
-var router = new express.Router();
+const { ensureLoggedIn } = require('connect-ensure-login');
+const express = require('express');
+const passport = require('passport');
+
+const config = require('./config');
+const authorization = require('./middleware/authorization');
+const proxy = require('./proxy');
 
 
-router.get('/login', function(req, res) {
-  res.render('login.html', {auth0: config.auth0});
+const router = new express.Router();
+
+const RETURN_TO = encodeURI(`${config.app.protocol}://${config.app.host}`);
+const SSO_LOGOUT_URL = `https://${config.auth0.domain}${config.auth0.sso_logout_url}?returnTo=${RETURN_TO}&client_id=${config.auth0.clientID}`;
+
+
+router.get('/login', (req, res, next) => {
+  if (req.isAuthenticated()) {
+    if (/^http/.test(req.session.returnTo)) {
+      res.send(400, 'URL must be relative');
+    } else {
+      res.redirect(req.session.returnTo);
+    }
+  } else {
+    passport.authenticate('auth0-oidc')(req, res, next);
+  }
 });
 
-router.get('/logout', function(req, res) {
+router.get(['/logout', '/auth-sign-out'], (req, res) => {
   req.logout();
-  res.redirect('/login');
-});
-
-router.get('/auth-sign-out', function (req, res) {
-  req.logout();
-  res.redirect('/login');
+  req.session.destroy(() => {
+    res.clearCookie(config.session.name);
+    res.redirect(SSO_LOGOUT_URL);
+  });
 });
 
 router.get('/callback', [
-  passport.authenticate('auth0', { failureRedirect: '/login' }),
-  function(req, res) {
+  passport.authenticate('auth0-oidc', { failureRedirect: '/login' }),
+  (req, res) => {
     res.redirect(req.session.returnTo || '/');
-  }
+  },
 ]);
 
 router.all(/.*/, [
   ensureLoggedIn('/login'),
-  middleware.denyUnauthorized,
-  function(req, res) {
-    parseBody(req).then(function (body) {
+  authorization,
+  (req, res) => {
+    parseBody(req).then((body) => {
       req.body = body;
       proxy.web(req, res);
     });
-  }
+  },
 ]);
 
 function parseBody(req) {
-  var body = [];
-  return new Promise(function (resolve, reject) {
-    req.on('data', function (chunk) { body.push(chunk); });
-    req.on('end', function () { resolve(body); });
-    req.on('error', function (err) { reject(err); });
+  let body = [];
+  return new Promise((resolve, reject) => {
+    req.on('data', (chunk) => { body.push(chunk); });
+    req.on('end', () => { resolve(body); });
+    req.on('error', (err) => { reject(err); });
   });
 }
 
