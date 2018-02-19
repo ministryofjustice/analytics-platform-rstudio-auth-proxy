@@ -28,6 +28,7 @@ config.auth0 = {
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
   domain: process.env.AUTH0_DOMAIN,
   passReqToCallback: true,
+  prompt: 'none',
   scope: 'profile',
   sso_logout_url: '/v2/logout',
 };
