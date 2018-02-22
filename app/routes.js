@@ -24,7 +24,8 @@ router.get('/login', (req, res, next) => {
     }
   } else {
     passport.authenticate(
-      'auth0-oidc', { prompt: req.query.prompt || config.auth0.prompt },
+      'auth0-oidc',
+      { prompt: req.query.prompt || config.auth0.prompt },
     )(req, res, next);
   }
 });
@@ -44,6 +45,15 @@ router.get('/callback', [
   },
 ]);
 
+function parseBody(req) {
+  const body = [];
+  return new Promise((resolve, reject) => {
+    req.on('data', (chunk) => { body.push(chunk); });
+    req.on('end', () => { resolve(body); });
+    req.on('error', (err) => { reject(err); });
+  });
+}
+
 router.all(/.*/, [
   ensureLoggedIn('/login'),
   authorization,
@@ -54,15 +64,6 @@ router.all(/.*/, [
     });
   },
 ]);
-
-function parseBody(req) {
-  let body = [];
-  return new Promise((resolve, reject) => {
-    req.on('data', (chunk) => { body.push(chunk); });
-    req.on('end', () => { resolve(body); });
-    req.on('error', (err) => { reject(err); });
-  });
-}
 
 
 module.exports = router;
