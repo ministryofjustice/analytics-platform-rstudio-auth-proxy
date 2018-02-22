@@ -13,6 +13,8 @@ const RETURN_TO = encodeURI(`${config.app.protocol}://${config.app.host}`);
 const SSO_LOGOUT_URL = `https://${config.auth0.domain}${config.auth0.sso_logout_url}?returnTo=${RETURN_TO}&client_id=${config.auth0.clientID}`;
 
 
+router.get('/healthz', (req, res) => res.sendStatus(200));
+
 router.get('/login', (req, res, next) => {
   if (req.isAuthenticated()) {
     if (/^http/.test(req.session.returnTo)) {
@@ -22,7 +24,8 @@ router.get('/login', (req, res, next) => {
     }
   } else {
     passport.authenticate(
-      'auth0-oidc', { prompt: req.query.prompt || config.auth0.prompt },
+      'auth0-oidc',
+      { prompt: req.query.prompt || config.auth0.prompt },
     )(req, res, next);
   }
 });
@@ -42,6 +45,15 @@ router.get('/callback', [
   },
 ]);
 
+function parseBody(req) {
+  const body = [];
+  return new Promise((resolve, reject) => {
+    req.on('data', (chunk) => { body.push(chunk); });
+    req.on('end', () => { resolve(body); });
+    req.on('error', (err) => { reject(err); });
+  });
+}
+
 router.all(/.*/, [
   ensureLoggedIn('/login'),
   authorization,
@@ -52,15 +64,6 @@ router.all(/.*/, [
     });
   },
 ]);
-
-function parseBody(req) {
-  let body = [];
-  return new Promise((resolve, reject) => {
-    req.on('data', (chunk) => { body.push(chunk); });
-    req.on('end', () => { resolve(body); });
-    req.on('error', (err) => { reject(err); });
-  });
-}
 
 
 module.exports = router;
