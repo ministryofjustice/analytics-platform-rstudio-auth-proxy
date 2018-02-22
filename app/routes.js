@@ -13,6 +13,8 @@ const RETURN_TO = encodeURI(`${config.app.protocol}://${config.app.host}`);
 const SSO_LOGOUT_URL = `https://${config.auth0.domain}${config.auth0.sso_logout_url}?returnTo=${RETURN_TO}&client_id=${config.auth0.clientID}`;
 
 
+router.get('/healthz', (req, res) => res.sendStatus(200));
+
 router.get('/login', (req, res, next) => {
   if (req.isAuthenticated()) {
     if (/^http/.test(req.session.returnTo)) {
