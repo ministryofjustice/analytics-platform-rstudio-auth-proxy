@@ -20,6 +20,10 @@ config.session = {
   resave: true,
   saveUninitialized: true,
   secret: process.env.COOKIE_SECRET || 'shh-its-a-secret',
+  cookie: {
+    // `COOKIE_MAXAGE` in seconds (defaults to 1 hour = 3,600,000 ms)
+    maxAge: (Number.parseInt(process.env.COOKIE_MAXAGE, 10) || 3600) * 1000,
+  },
 };
 
 config.auth0 = {
