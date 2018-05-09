@@ -17,7 +17,7 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
-    "http-proxy": "^1.16.2",
+    "http-proxy": "^1.17.0",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
     "passport-auth0-openidconnect": "^0.1.1",
