@@ -20,7 +20,7 @@
     "http-proxy": "^1.17.0",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
-    "passport-auth0-openidconnect": "^0.2.0",
+    "passport-auth0-openidconnect": "^0.1.1",
     "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
