@@ -1,6 +1,7 @@
 # analytics-platform-rstudio-auth-proxy
 RStudio auth proxy
 
+[![Docker Repository on Quay](https://quay.io/repository/mojanalytics/rstudio-auth-proxy/status "Docker Repository on Quay")](https://quay.io/repository/mojanalytics/rstudio-auth-proxy)
 
 ### Environment variables
 
