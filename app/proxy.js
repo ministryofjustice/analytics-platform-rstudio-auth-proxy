@@ -1,7 +1,7 @@
-var auth = require('./auth');
-var config = require('./config');
-var httpProxy = require('http-proxy');
-var log = require('bole')('proxy');
+const auth = require('./auth');
+const config = require('./config');
+const httpProxy = require('http-proxy');
+const log = require('bole')('proxy');
 
 
 var proxy = httpProxy.createProxyServer(config.proxy);

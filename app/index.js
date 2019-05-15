@@ -5,6 +5,8 @@ const morgan = require('morgan');
 const passport = require('passport');
 const path = require('path');
 const Auth0Strategy = require('passport-auth0-openidconnect').Strategy;
+const authorization = require('./middleware/authorization');
+const { compose } = require('compose-middleware');
 
 const config = require('./config');
 const errors = require('./errors');
@@ -18,10 +20,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(require('serve-favicon')(path.join(__dirname, 'favicon.ico')));
 
 bole.output({ level: config.log.level, stream: process.stdout });
-app.use(morgan('combined'));
 
-app.use(require('cookie-parser')());
-app.use(require('express-session')(config.session));
+const logger = morgan('combined');
+const cookieParser = require('cookie-parser')();
+const session = require('express-session')(config.session);
+
+app.use(logger);
+app.use(cookieParser);
+app.use(session);
 
 const strategy = new Auth0Strategy(
   config.auth0,
@@ -48,11 +54,20 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-app.use(passport.initialize());
-app.use(passport.session());
+const initialize = passport.initialize();
+const passportSession = passport.session();
+app.use(initialize);
+app.use(passportSession);
 
 app.use(routes);
 app.use(errors);
-
+app.set('websocketMiddleware', compose([
+  logger,
+  cookieParser,
+  session,
+  initialize,
+  passportSession,
+  authorization,
+]));
 
 module.exports = app;

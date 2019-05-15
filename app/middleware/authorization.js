@@ -12,11 +12,19 @@ function isAuthorized(req) {
   return false;
 }
 
-module.exports = function (req, res, next) {
+module.exports = (req, res, next) => {
   if (isAuthorized(req)) {
     next();
   } else {
-    res.sendStatus(403);
-    next(new Error('User is not authorized'));
+    const err = new Error('User is not authorized');
+    if (Object.prototype.hasOwnProperty.call(res, 'end')) {
+      // if res is a stream / socket instead of a ServerResponse then close it
+      res.end();
+      throw err;
+    } else {
+      // else set the status to 403 because it's a http.ServerResponse
+      res.sendStatus(403);
+    }
+    next(err);
   }
 };
