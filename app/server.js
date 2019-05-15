@@ -18,6 +18,8 @@ server.listen(config.express.port, config.express.host, function (error) {
   log.info('Listening on ' + config.express.host + ':' + config.express.port);
 });
 
-server.on('upgrade', function (req, socket, head) {
-  proxy.ws(req, socket, head);
+server.on('upgrade', (req, socket, head) => {
+  app.get('websocketMiddleware')(req, socket, () => {
+    proxy.ws(req, socket, head);
+  });
 });
