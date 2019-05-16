@@ -45,23 +45,11 @@ router.get('/callback', [
   },
 ]);
 
-function parseBody(req) {
-  const body = [];
-  return new Promise((resolve, reject) => {
-    req.on('data', (chunk) => { body.push(chunk); });
-    req.on('end', () => { resolve(body); });
-    req.on('error', (err) => { reject(err); });
-  });
-}
-
 router.all(/.*/, [
   ensureLoggedIn('/login'),
   authorization,
   (req, res) => {
-    parseBody(req).then((body) => {
-      req.body = body;
-      proxy.web(req, res);
-    });
+    proxy.web(req, res);
   },
 ]);
 

@@ -8,12 +8,12 @@ var proxy = httpProxy.createProxyServer(config.proxy);
 
 proxy.on('proxyReq', function (proxyReq, req, res, options) {
   proxyReq.setHeader('Cookie', insert_auth_cookie(req));
-  proxy_body(req, proxyReq);
+  set_content_lenght(req, proxyReq);
 });
 
 proxy.on('proxyReqWs', function (proxyReqWs, req, res, options) {
   proxyReqWs.setHeader('Cookie', insert_auth_cookie(req));
-  proxy_body(req, proxyReqWs);
+  set_content_lenght(req, proxyReqWs);
 });
 
 proxy.on('error', function (err) {
@@ -39,23 +39,10 @@ function insert_cookie(req, name, value) {
   return cookies.join('; ');
 }
 
-function proxy_body(req, proxyReq) {
-  if (req.body && req.body.length) {
-    proxyReq.setHeader('Content-Length', content_length(req));
-    write_body(req, proxyReq);
+function set_content_lenght(req, proxyReq) {
+  if (req.headers['content-length']) {
+    proxyReq.setHeader('Content-Length', req.headers['content-length']);
   }
-}
-
-function content_length(req) {
-  return req.body.reduce(function (length, chunk) {
-    return length + chunk.byteLength;
-  }, 0);
-}
-
-function write_body(req, proxyReq) {
-  req.body.map(function (chunk) {
-    proxyReq.write(chunk);
-  });
 }
 
 
