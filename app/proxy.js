@@ -6,19 +6,19 @@ const log = require('bole')('proxy');
 
 var proxy = httpProxy.createProxyServer(config.proxy);
 
-proxy.on('proxyReq', proxy_request);
-proxy.on('proxyReqWs', proxy_request);
+proxy.on('proxyReq', proxyRequest);
+proxy.on('proxyReqWs', proxyRequest);
 proxy.on('error', function (err) {
   log.error(err);
 });
 
-function proxy_request(proxyReq, req, res, options) {
+function proxyRequest(proxyReq, req, res, options) {
   const secureCookie = auth.secureCookie(
     config.rstudio.user,
     config.rstudio.duration,
     config.rstudio.key,
   );
-  const cookies = insert_cookie(req, 'user-id', secureCookie);
+  const cookies = insertCookie(req, 'user-id', secureCookie);
 
   proxyReq.setHeader('Cookie', cookies);
   if (req.headers['content-length']) {
@@ -26,7 +26,7 @@ function proxy_request(proxyReq, req, res, options) {
   }
 };
 
-function insert_cookie(req, name, value) {
+function insertCookie(req, name, value) {
   log.debug('cookie header:', req.headers['Cookie']);
   var cookies = (req.headers['Cookie'] || '').split('; ');
 
