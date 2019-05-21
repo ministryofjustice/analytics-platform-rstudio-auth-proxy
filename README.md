@@ -1,3 +1,6 @@
+# DEPRECATED
+This proxy/repository is not **deprecated** and not used by the [latest version of our RStudio helm chart (`2.0.0`)](https://github.com/ministryofjustice/analytics-platform-helm-charts/blob/master/charts/rstudio/README.md). Use the other [`auth-proxy`](https://github.com/ministryofjustice/analytics-platform-auth-proxy) configuring `RSTUDIO_ADD_SECURE_COOKIE`, `RSTUDIO_SECURE_COOKIE_KEY` and `USER` as documented in README's Configuration section.
+
 # analytics-platform-rstudio-auth-proxy
 RStudio auth proxy
 
