@@ -37,4 +37,4 @@ function secureCookie(value, validDuration, cookieKey) {
 }
 
 
-module.exports.cookie = secureCookie;
+module.exports.secureCookie = secureCookie;
