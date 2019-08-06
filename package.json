@@ -23,7 +23,7 @@
     "lodash": "^4.17.13",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
-    "passport-auth0-openidconnect": "^0.1.1",
+    "passport-auth0-openidconnect": "^0.2.0",
     "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
