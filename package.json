@@ -20,7 +20,7 @@
     "express-session": "^1.15.6",
     "hoek": "4.2.1",
     "http-proxy": "^1.17.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-auth0-openidconnect": "^0.1.1",
